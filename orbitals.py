@@ -3,10 +3,8 @@
 
 import cairo, Image
 import numpy as np
-from numpy import sin, cos, pi, arctan2, square,sqrt, logical_not,\
-                  linspace, array, zeros
-from numpy.random import random, randint, shuffle
-from time import time
+from numpy import sin, cos, pi
+from numpy.random import random
 
 from speedup.speedup import pyx_set_distances
 from speedup.speedup import pyx_iteration
@@ -18,8 +16,8 @@ COLOR_PATH = '../colors/dark_cyan_white_black.gif'
 PI = pi
 TWOPI = pi*2.
 
-SIZE = 1000 # size of png image
-NUM = 100 # number of nodes
+SIZE = 20000 # size of png image
+NUM = 1000 # number of nodes
 MAXFS = 20 # max friendships pr node
 
 BACK = 1. # background color
@@ -34,7 +32,7 @@ RAD = 0.15 # radius of starting circle
 FARL  = 0.15 # ignore "enemies" beyond this radius
 NEARL = 0.02 # do not attempt to approach friends close than this
 
-UPDATE_NUM = 1000
+UPDATE_NUM = 5000
 
 FRIENDSHIP_RATIO = 0.1 # probability of friendship dens
 FRIENDSHIP_INITIATE_PROB = 0.1 # probability of friendship initation attempt
@@ -81,6 +79,9 @@ class Render(object):
     self.ctx = ctx
 
   def __get_colors(self,f):
+
+    from numpy.random import shuffle
+
     scale = 1./255.
     im = Image.open(f)
     w,h = im.size
@@ -142,6 +143,10 @@ def make_friends(i,F,R):
       return
 
 def main():
+
+  from numpy.random import randint
+  from numpy import zeros
+  from time import time
 
   render = Render()
 
