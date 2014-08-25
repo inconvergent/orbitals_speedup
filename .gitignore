@@ -2,7 +2,11 @@
 *.*~
 *.swp
 run*/*
-colors.gif
 *.pyc
-*.pkl
-resources
+.ropeproject
+build
+profile
+*.so
+*.c
+*.html
+
