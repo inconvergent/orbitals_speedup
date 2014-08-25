@@ -9,10 +9,11 @@ from numpy.random import random, randint, shuffle
 from time import time
 
 from speedup.speedup import pyx_set_distances
+from speedup.speedup import pyx_iteration
 
 np.random.seed(1)
 
-COLOR_PATH = 'color/dark_cyan_white_black.gif'
+COLOR_PATH = '../colors/dark_cyan_white_black.gif'
 
 PI = pi
 TWOPI = pi*2.
@@ -64,9 +65,9 @@ class Render(object):
   def __init__(self):
 
     self.__init_cairo()
-    #self.__get_colors(COLOR_PATH)
-    self.colors = [(0,0,0)]
-    self.n_colors = 1
+    self.__get_colors(COLOR_PATH)
+    #self.colors = [(0,0,0)]
+    #self.n_colors = 1
 
   def __init_cairo(self):
 
@@ -113,17 +114,6 @@ class Render(object):
         self.ctx.rectangle(x,y,ONE,ONE)
         self.ctx.fill()
 
-def set_distances(X,Y,A,R):
-
-  for i in xrange(NUM):
-
-    dx = X[i] - X
-    dy = Y[i] - Y
-    R[i,:] = square(dx)+square(dy)
-    A[i,:] = arctan2(dy,dx)
-
-  sqrt(R,R)
-
 def make_friends(i,F,R):
 
   cand_num = F.sum(axis=1)
@@ -132,7 +122,7 @@ def make_friends(i,F,R):
     return
 
   cand_mask = cand_num<MAXFS
-  cand_mask[i] = False
+  cand_mask[i] = 0
   cand_ind = cand_mask.nonzero()[0]
 
   cand_dist = R[i,cand_ind].flatten()
@@ -149,38 +139,8 @@ def make_friends(i,F,R):
     if random()<FRIENDSHIP_RATIO:
 
       j = cand_ind[k]
-      F[[i,j],[j,i]] = True
+      F[[i,j],[j,i]] = 1
       return
-
-def iteration(X,Y,A,R,F,SX,SY,num,farl,nearl):
-
-  #set_distances(X,Y,A,R)
-  pyx_set_distances(X,Y,A,R,num)
-
-  SX[:] = 0.
-  SY[:] = 0.
-
-  for i in xrange(num):
-    xF = logical_not(F[i,:])
-    d = R[i,:]
-    a = A[i,:]
-    near = d > nearl
-    near[xF] = False
-    far = d < farl
-    far[near] = False
-    near[i] = False
-    far[i] = False
-    speed = farl - d[far]
-
-    SX[near] += cos(a[near])
-    SY[near] += sin(a[near])
-    SX[far] -= speed*cos(a[far])
-    SY[far] -= speed*sin(a[far])
-
-  X += SX*STP
-  Y += SY*STP
-
-  return
 
 def main():
 
@@ -192,7 +152,7 @@ def main():
   SY = zeros(NUM,'float')
   R = zeros((NUM,NUM),'float')
   A = zeros((NUM,NUM),'float')
-  F = zeros((NUM,NUM),'byte')
+  F = zeros((NUM,NUM),'int')
 
   for i in xrange(NUM):
     the = random()*TWOPI
@@ -202,25 +162,26 @@ def main():
     Y[i] = 0.5+y
 
   t_cum = 0.
+  show_connections = render.connections
   for itt in xrange(STEPS):
 
     t = time()
 
-    iteration(X,Y,A,R,F,SX,SY,NUM,FARL,NEARL)
+    pyx_set_distances(X,Y,A,R,NUM)
+    pyx_iteration(X,Y,A,R,F,SX,SY,NUM,STP,FARL,NEARL)
 
     if random()<FRIENDSHIP_INITIATE_PROB:
 
       k = randint(NUM)
       make_friends(k,F,R)
 
-    render.connections(X,Y,F,A,R)
+    show_connections(X,Y,F,A,R)
 
     t_cum += time()-t
 
     if not (itt+1)%100:
 
       print itt, t_cum
-
 
     if not (itt+1)%UPDATE_NUM:
 
@@ -232,5 +193,16 @@ def main():
 
 
 if __name__ == '__main__' :
-  main()
+
+  if True:
+
+    import pstats, cProfile
+    fn = './profile/profile'
+    cProfile.run('main()',fn)
+    p = pstats.Stats(fn)
+    p.strip_dirs().sort_stats('cumulative').print_stats()
+
+  else:
+
+    main()
 
