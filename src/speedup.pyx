@@ -68,8 +68,6 @@ def pyx_iteration(np.ndarray[double, mode="c",ndim=1] X,
                   np.ndarray[double, mode="c",ndim=2] A,
                   np.ndarray[double, mode="c",ndim=2] R,
                   np.ndarray[long, mode="c",ndim=2] F,
-                  np.ndarray[double, mode="c",ndim=1] SX,
-                  np.ndarray[double, mode="c",ndim=1] SY,
                   int num,
                   float stp,
                   float farl,
@@ -78,13 +76,15 @@ def pyx_iteration(np.ndarray[double, mode="c",ndim=1] X,
   cdef float a
   cdef float dx
   cdef float dy
+  cdef float sx
+  cdef float sy
+  cdef float speed
   cdef int i
   cdef int j
 
-  SX[:] = 0.
-  SY[:] = 0.
-
   for i in xrange(num):
+    sx = 0.
+    sy = 0.
     for j in xrange(num):
 
       if i == j:
@@ -97,19 +97,20 @@ def pyx_iteration(np.ndarray[double, mode="c",ndim=1] X,
 
       if F[i,j]>0:
         if d<nearl:
-          SX[j] -= dx*(farl-d)
-          SY[j] -= dy*(farl-d)
+          speed = farl-d
+          sx += dx*speed
+          sy += dy*speed
         else:
-          SX[j] += dx
-          SY[j] += dy
+          sx -= dx
+          sy -= dy
       else:
         if d<farl:
-          SX[j] -= dx*(farl-d)
-          SY[j] -= dy*(farl-d)
+          speed = farl-d
+          sx += dx*speed
+          sy += dy*speed
 
-  for i in xrange(num):
-    X[i] += SX[i]*stp
-    Y[i] += SY[i]*stp
+    X[i] += sx*stp
+    Y[i] += sy*stp
 
   return
 

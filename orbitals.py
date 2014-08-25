@@ -23,22 +23,21 @@ NUM = 100 # number of nodes
 MAXFS = 20 # max friendships pr node
 
 BACK = 1. # background color
-GRAINS = 30
+GRAINS = 45
 ALPHA = 0.05 # opacity of drawn points
 STEPS = 10**7
 
 ONE = 1./SIZE
-#STP = 0.0001 # scale motion in each iteration by this
 STP = ONE/15.
 
-RAD = 0.26 # radius of starting circle
-FARL  = 0.13 # ignore "enemies" beyond this radius
-NEARL = 0.01 # do not attempt to approach friends close than this
+RAD = 0.15 # radius of starting circle
+FARL  = 0.15 # ignore "enemies" beyond this radius
+NEARL = 0.02 # do not attempt to approach friends close than this
 
 UPDATE_NUM = 1000
 
 FRIENDSHIP_RATIO = 0.1 # probability of friendship dens
-FRIENDSHIP_INITIATE_PROB = 0.02 # probability of friendship initation attempt
+FRIENDSHIP_INITIATE_PROB = 0.1 # probability of friendship initation attempt
 
 FILENAME = './img/res_c_num{:d}_fs{:d}_near{:2.4f}_far{:2.4f}_pa{:2.4f}_pb{:2.4f}'\
            .format(NUM,MAXFS,NEARL,FARL,\
@@ -148,18 +147,17 @@ def main():
 
   X = zeros(NUM,'float')
   Y = zeros(NUM,'float')
-  SX = zeros(NUM,'float')
-  SY = zeros(NUM,'float')
   R = zeros((NUM,NUM),'float')
   A = zeros((NUM,NUM),'float')
   F = zeros((NUM,NUM),'int')
 
   for i in xrange(NUM):
     the = random()*TWOPI
+    phi = random()*TWOPI
     x = RAD * sin(the)
     y = RAD * cos(the)
-    X[i] = 0.5+x
-    Y[i] = 0.5+y
+    X[i] = 0.5+x + cos(phi)*RAD*0.05
+    Y[i] = 0.5+y + sin(phi)*RAD*0.05
 
   t_cum = 0.
   show_connections = render.connections
@@ -168,7 +166,7 @@ def main():
     t = time()
 
     pyx_set_distances(X,Y,A,R,NUM)
-    pyx_iteration(X,Y,A,R,F,SX,SY,NUM,STP,FARL,NEARL)
+    pyx_iteration(X,Y,A,R,F,NUM,STP,FARL,NEARL)
 
     if random()<FRIENDSHIP_INITIATE_PROB:
 
