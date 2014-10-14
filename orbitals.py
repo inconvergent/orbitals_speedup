@@ -9,35 +9,36 @@ from numpy.random import random
 from speedup.speedup import pyx_set_distances
 from speedup.speedup import pyx_iteration
 
-np.random.seed(1)
+#np.random.seed(1)
 
 COLOR_PATH = '../colors/dark_cyan_white_black.gif'
+#COLOR_PATH = '../colors/shimmering.gif'
 
 PI = pi
 TWOPI = pi*2.
 
 SIZE = 20000 # size of png image
-NUM = 1000 # number of nodes
-MAXFS = 20 # max friendships pr node
+NUM = 500 # number of nodes
+MAXFS = 10 # max friendships pr node
 
 BACK = 1. # background color
-GRAINS = 45
+GRAINS = 40
 ALPHA = 0.05 # opacity of drawn points
 STEPS = 10**7
 
 ONE = 1./SIZE
 STP = ONE/15.
 
-RAD = 0.15 # radius of starting circle
-FARL  = 0.15 # ignore "enemies" beyond this radius
+RAD = 0.26 # radius of starting circle
+FARL  = 0.13 # ignore "enemies" beyond this radius
 NEARL = 0.02 # do not attempt to approach friends close than this
 
-UPDATE_NUM = 5000
+UPDATE_NUM = 4000
 
 FRIENDSHIP_RATIO = 0.1 # probability of friendship dens
-FRIENDSHIP_INITIATE_PROB = 0.1 # probability of friendship initation attempt
+FRIENDSHIP_INITIATE_PROB = 0.05 # probability of friendship initation attempt
 
-FILENAME = './img/res_c_num{:d}_fs{:d}_near{:2.4f}_far{:2.4f}_pa{:2.4f}_pb{:2.4f}'\
+FILENAME = './img/ff_c_num{:d}_fs{:d}_near{:2.4f}_far{:2.4f}_pa{:2.4f}_pb{:2.4f}'\
            .format(NUM,MAXFS,NEARL,FARL,\
                    FRIENDSHIP_RATIO,FRIENDSHIP_INITIATE_PROB)
 FILENAME = FILENAME + '_itt{:05d}.png'
