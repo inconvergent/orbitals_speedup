@@ -9,7 +9,6 @@ cdef double PI = np.pi
 
 #from libc.stdlib cimport malloc, free
 from libc.math cimport sqrt
-from libc.math cimport pow
 from libc.math cimport cos
 from libc.math cimport sin
 from libc.math cimport atan2
@@ -18,10 +17,6 @@ int = np.int
 ctypedef np.int_t int_t
 double = np.double
 ctypedef np.double_t double_t
-
-cdef inline double norm(double a, double b):
-  cdef double dd = sqrt(pow(a,2)+pow(b,2))
-  return dd
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
@@ -49,12 +44,12 @@ def pyx_set_distances(np.ndarray[double, mode="c",ndim=1] X,
 
       dx = x-X[j]
       dy = y-Y[j]
-      d = norm(dx,dy)
+      d = sqrt(dx*dx + dy*dy)
 
       A[i,j] = atan2(dy,dx)
       A[j,i] = atan2(-dy,-dx)
-      R[i,j] = d
 
+      R[i,j] = d
       R[j,i] = d
 
   return

@@ -6,7 +6,7 @@ from Cython.Build import cythonize
 from Cython.Distutils import build_ext
 import numpy
 
-_extra = ['-O3']
+_extra = ['-O3', '-ffast-math']
 
 extensions = [
   Extension('speedup',
