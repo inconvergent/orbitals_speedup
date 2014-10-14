@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import cairo
+import gtk, gobject
+
 
 class Render(object):
 
@@ -80,4 +82,44 @@ class Render(object):
       for x,y in zip(xp,yp):
         rectangle(x,y,one,one)
         fill()
+
+class Animate(Render):
+
+  def __init__(self,color_path,back,alpha,grains,size, step):
+
+    Render.__init__(self, color_path, back,alpha, grains, size)
+
+    window = gtk.Window()
+    window.resize(self.size, self.size)
+
+    self.step = step
+
+    window.connect("destroy", self.__destroy)
+    darea = gtk.DrawingArea()
+    darea.connect("expose-event", self.expose)
+    window.add(darea)
+    window.show_all()
+
+    self.darea = darea
+    self.steps = 0
+
+    gobject.idle_add(self.step_wrap)
+
+  def __destroy(self,*args):
+
+    gtk.main_quit(*args)
+
+  def expose(self,*args):
+
+    cr = self.darea.window.cairo_create()
+    cr.set_source_surface(self.sur,0,0)
+    cr.paint()
+
+  def step_wrap(self):
+
+    res = self.step(self)
+    self.steps += 1
+    self.expose()
+
+    return res
 
