@@ -89,7 +89,7 @@ def main():
 
 if __name__ == '__main__' :
 
-  if False:
+  if True:
 
     import pstats, cProfile
     fn = './profile/profile'

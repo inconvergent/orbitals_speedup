@@ -4,9 +4,6 @@
 from numpy.random import random, randint
 from numpy import zeros, sin, cos
 
-from speedup.speedup import pyx_set_distances
-from speedup.speedup import pyx_iteration
-
 class Orbitals(object):
 
   def __init__(self,num,stp,farl,nearl,friendship_ratio,
@@ -25,7 +22,6 @@ class Orbitals(object):
     self.R = zeros((num,num),'float')
     self.A = zeros((num,num),'float')
     self.F = zeros((num,num),'int')
-
 
   def make_friends(self,i):
 
@@ -71,6 +67,9 @@ class Orbitals(object):
       self.Y[i] = 0.5+y + sin(phi)*rad*0.05
 
   def step(self):
+
+    from speedup.speedup import pyx_set_distances
+    from speedup.speedup import pyx_iteration
 
     pyx_set_distances(self.X,self.Y,self.A,self.R,self.num)
     pyx_iteration(self.X,self.Y,self.A,self.R,self.F,self.num,
