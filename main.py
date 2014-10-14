@@ -1,21 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from numpy import sin, cos, pi
-from numpy.random import random
-
-from itertools import count
-
-from speedup.speedup import pyx_set_distances
-from speedup.speedup import pyx_iteration
-
 #np.random.seed(1)
 
 COLOR_PATH = '../colors/dark_cyan_white_black.gif'
 #COLOR_PATH = '../colors/shimmering.gif'
-
-PI = pi
-TWOPI = pi*2.
 
 SIZE = 1080 # size of png image
 NUM = 200 # number of nodes
@@ -38,7 +27,7 @@ FRIENDSHIP_RATIO = 0.1 # probability of friendship dens
 FRIENDSHIP_INITIATE_PROB = 0.1 # probability of friendship initation attempt
 
 FILENAME = './img/ff_c_num{:d}_fs{:d}_near{:2.4f}_far{:2.4f}_pa{:2.4f}_pb{:2.4f}'\
-           .format(NUM,MAXFS,NEARL,FARL,\
+           .format(NUM,MAXFS,NEARL,FARL,
                    FRIENDSHIP_RATIO,FRIENDSHIP_INITIATE_PROB)
 FILENAME = FILENAME + '_itt{:05d}.png'
 
@@ -56,78 +45,20 @@ print 'FRIENDSHIP_RATIO', FRIENDSHIP_RATIO
 print 'FRIENDSHIP_INITIATE_PROB', FRIENDSHIP_INITIATE_PROB
 print
 
-def make_friends(i,f,r, friendship_ratio, maxfs):
-
-  cand_num = f.sum(axis=1)
-
-  if cand_num[i]>=maxfs:
-    return
-
-  cand_mask = cand_num<maxfs
-  cand_mask[i] = 0
-  cand_ind = cand_mask.nonzero()[0]
-
-  cand_dist = r[i,cand_ind].flatten()
-  cand_sorted_dist = cand_dist.argsort()
-  cand_ind = cand_ind[cand_sorted_dist]
-
-  cand_n = len(cand_ind)
-
-  if cand_n<1:
-    return
-
-  for k in xrange(cand_n):
-
-    if random()<friendship_ratio:
-
-      j = cand_ind[k]
-      f[[i,j],[j,i]] = 1
-      return
-
-def init(xx,yy,rad):
-
-  from numpy import pi
-
-  for i in xrange(NUM):
-    the = random()*pi*2
-    phi = random()*pi*2
-    x = rad * sin(the)
-    y = rad * cos(the)
-    xx[i] = 0.5+x + cos(phi)*rad*0.05
-    yy[i] = 0.5+y + sin(phi)*rad*0.05
-
-def step(xx,yy,aa,rr,ff,stp,farl,nearl,friendship_ratio,
-         friendship_initiate_prob,maxfs):
-
-  from numpy.random import randint
-
-  num = len(xx)
-
-  pyx_set_distances(xx,yy,aa,rr,num)
-  pyx_iteration(xx,yy,aa,rr,ff,num,stp,farl,nearl)
-
-  if random()<friendship_initiate_prob:
-
-    k = randint(num)
-    make_friends(k,ff,rr,friendship_ratio, maxfs)
-
 
 def main():
 
-  from numpy import zeros
   from time import time
+  from itertools import count
 
   from render import Render
+  from orbitals import Orbitals
 
   render = Render(COLOR_PATH,BACK,ALPHA,GRAINS,SIZE)
 
-  X = zeros(NUM,'float')
-  Y = zeros(NUM,'float')
-  R = zeros((NUM,NUM),'float')
-  A = zeros((NUM,NUM),'float')
-  F = zeros((NUM,NUM),'int')
-
-  init(X,Y,RAD)
+  orbitals = Orbitals(NUM,STP,FARL,NEARL,FRIENDSHIP_RATIO,
+                      FRIENDSHIP_INITIATE_PROB,MAXFS)
+  orbitals.init(RAD)
 
   render_connections = render.connections
 
@@ -137,10 +68,8 @@ def main():
 
     t1 = time()
 
-    step(X,Y,A,R,F,STP,FARL,NEARL,FRIENDSHIP_RATIO,
-         FRIENDSHIP_INITIATE_PROB,MAXFS)
-
-    render_connections(X,Y,F,A,R)
+    orbitals.step()
+    render_connections(*orbitals.get_render_data())
 
     t2 = time()
 
