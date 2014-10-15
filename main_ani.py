@@ -22,7 +22,7 @@ RAD = 0.26 # radius of starting circle
 FARL  = 0.13 # ignore "enemies" beyond this radius
 NEARL = 0.02 # do not attempt to approach friends close than this
 
-UPDATE_NUM = 10
+UPDATE_NUM = 15
 
 FRIENDSHIP_RATIO = 0.1 # probability of friendship dens
 FRIENDSHIP_INITIATE_PROB = 0.1 # probability of friendship initation attempt
@@ -72,11 +72,14 @@ def main():
 
 if __name__ == '__main__' :
 
-  if True:
+  if False:
 
+    import pyximport
+    pyximport.install()
     import pstats, cProfile
+
     fn = './profile/profile'
-    cProfile.run('main()',fn)
+    cProfile.runctx("main()", globals(), locals(), fn)
     p = pstats.Stats(fn)
     p.strip_dirs().sort_stats('cumulative').print_stats()
 

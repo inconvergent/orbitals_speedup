@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+# cython: profile=True
+
 from __future__ import division
 
 import numpy as np
 cimport numpy as np
 cimport cython
 
-cdef double PI = np.pi
+cdef float PI = np.pi
 
 #from libc.stdlib cimport malloc, free
 from libc.math cimport sqrt
@@ -13,10 +15,60 @@ from libc.math cimport cos
 from libc.math cimport sin
 from libc.math cimport atan2
 
-int = np.int
-ctypedef np.int_t int_t
-double = np.double
-ctypedef np.double_t double_t
+
+# hack ahead ...
+
+@cython.wraparound(False)
+@cython.boundscheck(False)
+@cython.nonecheck(False)
+def pyx_connections(np.ndarray[double, mode="c",ndim=1] X,
+                    np.ndarray[double, mode="c",ndim=1] Y,
+                    np.ndarray[long, mode="c",ndim=2] F,
+                    np.ndarray[double, mode="c",ndim=2] A,
+                    np.ndarray[double, mode="c",ndim=2] R,
+                    long num,
+                    double one,
+                    tuple colors,
+                    long n_colors,
+                    double alpha,
+                    long grains,
+                    fill,
+                    rectangle,
+                    set_source_rgba,
+                    random):
+  cdef int i
+  cdef int j
+  cdef int k
+  cdef float a
+  cdef float d
+  cdef float s
+  cdef float x
+  cdef float y
+  cdef tuple rgb
+
+
+  cdef np.ndarray[double, mode="c",ndim=1] rnd
+
+  for i in xrange(num):
+    for j in xrange(i+1,num):
+
+      if F[i,j]<1:
+        continue
+
+      a = A[i,j]
+      d = R[i,j]
+
+      rnd = random(grains)
+
+      rgb = colors[ (i*num+j) % n_colors ]
+      set_source_rgba(rgb[0],rgb[1],rgb[2],alpha)
+
+      for k in xrange(grains):
+        s = rnd[k]
+        x = X[i] - d*s*cos(a)
+        y = Y[i] - d*s*sin(a)
+        rectangle(x,y,one,one)
+        fill()
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
@@ -27,11 +79,14 @@ def pyx_set_distances(np.ndarray[double, mode="c",ndim=1] X,
                       np.ndarray[double, mode="c",ndim=2] A,
                       np.ndarray[double, mode="c",ndim=2] R,
                       int num):
-  cdef double dx
-  cdef double dy
-  cdef double x
-  cdef double y
-  cdef double a
+
+  cdef int i
+  cdef int j
+  cdef float dx
+  cdef float dy
+  cdef float x
+  cdef float y
+  cdef float a
 
   for i in xrange(num):
     x = X[i]
@@ -63,7 +118,7 @@ def pyx_iteration(np.ndarray[double, mode="c",ndim=1] X,
                   np.ndarray[double, mode="c",ndim=2] A,
                   np.ndarray[double, mode="c",ndim=2] R,
                   np.ndarray[long, mode="c",ndim=2] F,
-                  int num,
+                  long num,
                   float stp,
                   float farl,
                   float nearl):

@@ -3,6 +3,7 @@
 
 import cairo
 import gtk, gobject
+from speedup.speedup import pyx_connections
 
 
 class Render(object):
@@ -47,8 +48,24 @@ class Render(object):
         res.append((r*scale,g*scale,b*scale))
 
     shuffle(res)
-    self.colors = res
+    self.colors = tuple(res)
     self.n_colors = len(res)
+
+  def connections_pyx(self,X,Y,F,A,R):
+
+    # this is rather hacky. connections is better code, but this is
+    # about twice as fast (on the configurations i tested), which is useful
+    # for animations
+
+    rectangle = self.ctx.rectangle
+    fill = self.ctx.fill
+    set_source_rgba = self.ctx.set_source_rgba
+    from numpy.random import random
+
+    num = len(X)
+
+    pyx_connections(X,Y,F,A,R,num,self.one,self.colors,self.n_colors,self.alpha,
+                    self.grains,fill,rectangle,set_source_rgba,random)
 
   def connections(self,X,Y,F,A,R):
 
