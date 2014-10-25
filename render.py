@@ -25,12 +25,16 @@ class Render(object):
     sur = cairo.ImageSurface(cairo.FORMAT_ARGB32,self.size,self.size)
     ctx = cairo.Context(sur)
     ctx.scale(self.size,self.size)
-    ctx.set_source_rgba(*self.back)
-    ctx.rectangle(0,0,1,1)
-    ctx.fill()
-
     self.sur = sur
     self.ctx = ctx
+
+    self.clear_canvas()
+
+  def clear_canvas(self):
+
+    self.ctx.set_source_rgba(*self.back)
+    self.ctx.rectangle(0,0,1,1)
+    self.ctx.fill()
 
   def __get_colors(self,f):
 
@@ -66,6 +70,35 @@ class Render(object):
 
     pyx_connections(X,Y,F,A,R,num,self.one,self.colors,self.n_colors,self.alpha,
                     self.grains,fill,rectangle,set_source_rgba,random)
+
+  def circles(self,X,Y,F,A,R):
+
+    from numpy import pi
+
+    r = self.one*7.
+
+    arc = self.ctx.arc
+    fill = self.ctx.fill
+
+    fnum = F.sum(axis=0)
+
+    for x,y,f in zip(X,Y,fnum):
+      arc(x,y,r,0,pi*2.)
+      fill()
+
+  def connections_lines(self,X,Y,F,A,R):
+
+    move_to = self.ctx.move_to
+    line_to = self.ctx.line_to
+    stroke = self.ctx.stroke
+
+    indsx,indsy = F.nonzero()
+    mask = indsx >= indsy
+
+    for i,j in zip(indsx[mask],indsy[mask]):
+      move_to(X[i],Y[i])
+      line_to(X[j],Y[j])
+      stroke()
 
   def connections(self,X,Y,F,A,R):
 
