@@ -71,11 +71,11 @@ class Render(object):
     pyx_connections(X,Y,F,A,R,num,self.one,self.colors,self.n_colors,self.alpha,
                     self.grains,fill,rectangle,set_source_rgba,random)
 
-  def circles(self,X,Y,F,A,R):
+  def circles(self,X,Y,F,A,R,r):
 
     from numpy import pi
 
-    r = self.one*7.
+    #r = self.one*7.
 
     arc = self.ctx.arc
     fill = self.ctx.fill

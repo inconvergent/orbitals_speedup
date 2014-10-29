@@ -13,7 +13,7 @@ NUM = 200 # number of nodes
 MAXFS = 10 # max friendships pr node
 
 BACK = [1,1,1,1] # background color
-GRAINS = 5
+GRAINS = 10
 ALPHA = 0.05 # opacity of drawn points
 
 STP = 0.0001
@@ -22,7 +22,7 @@ RAD = 0.26 # radius of starting circle
 FARL  = 0.13 # ignore "enemies" beyond this radius
 NEARL = 0.02 # do not attempt to approach friends close than this
 
-UPDATE_NUM = 15
+UPDATE_NUM = 35
 
 FRIENDSHIP_RATIO = 0.1 # probability of friendship dens
 FRIENDSHIP_INITIATE_PROB = 0.1 # probability of friendship initation attempt
