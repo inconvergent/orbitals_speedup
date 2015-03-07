@@ -13,7 +13,7 @@ around the canvas. Thus the final image is a history of all the friendships.
 
 This is the fastest version. Probably.
 
-![orbitals](http://inconvergent.net/xstatic/img-content/orbitals_ba.jpg "orbitals")
+![orbitals](http://inconvergent.net/img/orbitals_ba.jpg "orbitals")
 
 -----------
 http://inconvergent.net
