@@ -1,7 +1,7 @@
 Orbitals
 =============
 
-Orbitals is inspired by the naive optimization process that Jared Tarbell has
+Orbitals is based on the naive optimization process that Jared Tarbell has
 implemented in his "[Happy
 Place](http://www.complexification.net/gallery/machines/happyPlace/index.php)"
 algorithm. Nodes are created in some, more or less structured arangement,
@@ -13,7 +13,7 @@ around the canvas. Thus the final image is a history of all the friendships.
 
 This is the fastest version. Probably.
 
-![orbitals](http://inconvergent.net/img/orbitals_ba.jpg "orbitals")
+![orbitals](https://inconvergent.net/img/orbitals_ba.jpg "orbitals")
 
 -----------
-http://inconvergent.net
+https://inconvergent.net
